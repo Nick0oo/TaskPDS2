@@ -1,0 +1,32 @@
+{
+    "name": "task-manager",
+    "version": "1.0.0",
+    "description": "\"# TaskPDS2\"",
+    "main": "index.js",
+    "scripts": {
+        "compile": "tsc",
+        "start": "npm run compile && node ./dist/index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Nick0oo/TaskPDS2.git"
+    },
+    "keywords": [],
+    "bugs": {
+        "url": "https://github.com/Nick0oo/TaskPDS2/issues"
+    },
+    "homepage": "https://github.com/Nick0oo/TaskPDS2#readme",
+    "type": "commonjs",
+    "devDependencies": {
+        "@types/node": "^22.13.13",
+        "typescript": "^5.8.2"
+    },
+    "dependencies": {
+        "@apollo/server": "^4.11.3",
+        "cors": "^2.8.5",
+        "express": "^4.21.2",
+        "graphql": "^16.10.0"
+    }
+}
