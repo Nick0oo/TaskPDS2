@@ -4,6 +4,8 @@ const TagsTypes = gqlTags`
   type Tag {
     id: ID!
     name: String!
+    createdAt: String
+    updatedAt: String
     tasks: [Task]
   }
 

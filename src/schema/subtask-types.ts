@@ -1,4 +1,5 @@
 const gqlSubtaskTypes = require('graphql-tag');
+
 const SubtaskTypes = gqlSubtaskTypes`
   type Subtask {
     id: ID!
@@ -7,6 +8,9 @@ const SubtaskTypes = gqlSubtaskTypes`
     completed: Boolean!
     createdAt: String
     updatedAt: String
+
+    # Relaciones
+    task: Task
   }
 
   type Subtasks {
@@ -17,12 +21,14 @@ const SubtaskTypes = gqlSubtaskTypes`
     title: String!
     description: String
     completed: Boolean!
+    taskId: ID!
   }
 
   input UpdateSubtaskInput {
     title: String
     description: String
     completed: Boolean
+    taskId: ID
   }
 
   extend type Query {
@@ -36,4 +42,5 @@ const SubtaskTypes = gqlSubtaskTypes`
     deleteSubtask(id: ID!): Boolean!
   }
 `;
+
 module.exports = SubtaskTypes;

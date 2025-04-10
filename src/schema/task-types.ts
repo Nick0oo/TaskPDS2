@@ -58,6 +58,18 @@ const TaskTypes = gqlTask`
     updateTask(id: ID!, data: UpdateTaskInput!): Task
     deleteTask(id: ID!): Boolean!
   }
+  
+  extend type User {
+    tasks: [Task!]  
+  }
+  
+  extend type Status {
+    tasks: [Task!]  
+  }
+  
+  extend type Project {
+    tasks: Task
+  }
 `;
 
 module.exports = TaskTypes;

@@ -4,22 +4,29 @@ const PrioritiesTypes = gqlPrioritiesTypes`
   type Priorities {
     id: ID!
     name: String!
+    createdAt: String
+    updatedAt: String
     tasks: [Task]
   }
 
-  input PrioritiesInput {
+  input CreatePrioritiesInput {
     name: String!
   }
 
-  type Query {
-    allPriorities: [Priorities]
-    PrioritiesById(id: ID!): Priorities
+  input UpdatePrioritiesInput {
+    name: String
   }
 
-  type Mutation {
-    createPriorities(data: PrioritiesInput!): Priorities
-    updatePriorities(id: ID!, data: PrioritiesInput!): Priorities
-    deletePriorities(id: ID!): Boolean
+  extend type Query {
+    allPriorities: [Priorities]
+    prioritiesById(id: ID!): Priorities
+  }
+
+  extend type Mutation {
+    createPriority(data: CreatePrioritiesInput!): Priorities
+    updatePriority(id: ID!, data: UpdatePrioritiesInput!): Priorities
+    deletePriority(id: ID!): Boolean
   }
 `;
+
 module.exports = PrioritiesTypes;

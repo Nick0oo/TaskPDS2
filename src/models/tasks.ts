@@ -17,10 +17,13 @@ module.exports = function (sequelize: any) {
         allowNull: false,
       },
       dueDate: {
-        type: DataTypesTask.DATE,},
-      statusID: {
+        type: DataTypesTask.DATE,
+        allowNull: false,
+      },
+      statusId: {
         type: DataTypesTask.INTEGER,
         allowNull: false,
+        field: 'statusID',
       },
       priorityId: {
         type: DataTypesTask.INTEGER,

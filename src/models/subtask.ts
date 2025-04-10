@@ -4,17 +4,19 @@ module.exports = function (sequelize: any) {
     return sequelize.define(
         'Subtask',
         {
-            name: {
+            title: {
                 type: DataTypesSubtask.STRING,
                 allowNull: false,
+                field: "name"
             },
             description: {
                 type: DataTypesSubtask.STRING,
                 allowNull: true,
             },
-            status: {
+            completed: {
                 type: DataTypesSubtask.BOOLEAN,
                 allowNull: false,
+                field: "status",
             },
             createdAt: {
                 type: DataTypesSubtask.DATE,

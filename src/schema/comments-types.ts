@@ -8,10 +8,8 @@ const CommentTypes = gqlComment`
     description: String!
     createdAt: String
     updatedAt: String
-  }
-
-  type Comments {
-    comments: [Comment!]
+    user: User
+    task: Task
   }
 
   input CreateCommentInput {
@@ -23,18 +21,18 @@ const CommentTypes = gqlComment`
   input UpdateCommentInput {
     taskId: ID
     userId: ID
-    content: String
+    description: String
   }
 
   extend type Query {
     allComments: [Comment!]
-    commentById(id: ID!): Comment
+    commentsById(id: ID!): Comment
   }
 
   extend type Mutation {
-    createComment(data: CreateCommentInput!): Comment!
-    updateComment(id: ID!, data: UpdateCommentInput!): Comment
-    deleteComment(id: ID!): Boolean!
+    createComments(data: CreateCommentInput!): Comment!
+    updateComments(id: ID!, data: UpdateCommentInput!): Comment
+    deleteComments(id: ID!): Boolean!
   }
 `;
 

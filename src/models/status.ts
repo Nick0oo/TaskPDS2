@@ -10,10 +10,12 @@ module.exports = function (sequelize: any) {
                   primaryKey: true,
                 },
                 name: {
-                  type: DataTypesStatus.STRING, // ← CORRECTO
+                  type: DataTypesStatus.STRING,
                   allowNull: false,
                   unique: true,
                 },
               });
             
             };
+
+        

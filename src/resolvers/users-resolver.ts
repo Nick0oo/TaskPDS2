@@ -1,31 +1,33 @@
-const { Users: UserModel, Tasks: TaskUserModel } = require ("../models");
+const { Users: UserModel, Tasks: TaskUserModel } = require("../models");
 
 const usersResolver = {
   Query: {
-    allUSers: async () => {
+    allUsers: async () => {
       const users = await UserModel.findAll({
-        include: [{ model: Tasks, as: "tasks" }],
+        include: [{ model: TaskUserModel, as: "tasks" }],
       });
       return users;
     },
-    usersById: async (_: any, { id }: { id: number }) => {
-      return await UserModel.findByPk(id);
+    userById: async (_: any, { id }: { id: number }) => {
+      return await UserModel.findByPk(id, {
+        include: [{ model: TaskUserModel, as: "tasks" }],
+      });
     },
   },
   Mutation: {
-    createusers: async (_: any, { data }: { data: any }) => {
+    createUser: async (_: any, { data }: { data: Record<string, any> }) => {
       return await UserModel.create(data);
     },
-    updateusers: async (_: any, { id, data }: { id: number; data: Record<string, any> }) => {
+    updateUser: async (_: any, { id, data }: { id: number; data: Record<string, any> }) => {
       const [affectedCount] = await UserModel.update(data, {
         where: { id },
       });
       if (affectedCount > 0) {
-        return await Users.findByPk(id);
+        return await UserModel.findByPk(id);
       }
       return null;
     },
-    deleteusers: async (_: any, { id }: { id: number }) => {
+    deleteUser: async (_: any, { id }: { id: number }) => {
       const deletedCount = await UserModel.destroy({
         where: { id },
       });

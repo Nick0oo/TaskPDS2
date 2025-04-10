@@ -1,78 +1,59 @@
-const { Projects: ProjectsModel, Task: TaskProjectModel, User: UserProjectModel } = require('../models');
+const { Projects: ProjectsModel, Tasks: TaskProjectModel, Users: UserProjectModel } = require('../models');
+
 const projectsResolver = {
-    Query: {
-        allProjects: async () => {
-            const projects = await ProjectsModel.findAll({
-                include: [{ model: UserProjectModel, as: 'users' }, { model: TaskProjectModel, as: 'tasks' }],
-            });
-            return projects;
-        },
-        projectsById: async (_: any, { id }: { id: number }) => {
-            return await ProjectsModel.findByPk(id);
-        },
+  Query: {
+    allProjects: async () => {
+      return await ProjectsModel.findAll({
+        include: [
+          { model: UserProjectModel, as: 'user' },
+          { model: TaskProjectModel, as: 'tasks' },
+        ],
+      });
     },
-    Mutation: {
-        createProjects: async (_: any, { data }: { data: { [key: string]: any } }) => {
-            return await ProjectsModel.create(data);
-        },
-        updateProjects: async (_: any, { id }: { id: number }, { data }: { data: { [key: string]: any } }) => {
-            const [affectedCount] = await ProjectsModel.update(data, {
-                where: { id },
-            });
-            if (affectedCount > 0) {
-                return await ProjectsModel.findByPk(id);
-            }
-            return null;
-        },
-        deleteProjects: async (_: any, { id }: { id: number }) => {
-            const deletedCount = await ProjectsModel.destroy({
-                where: { id },
-            });
-            return deletedCount > 0;
-        },
+
+    projectsById: async (_: any, { id }: { id: number }) => {
+      return await ProjectsModel.findByPk(id, {
+        include: [
+          { model: UserProjectModel, as: 'user' },
+          { model: TaskProjectModel, as: 'tasks' },
+        ],
+      });
     },
-    User: {
-        projects: async (user: { id: number }): Promise<typeof ProjectsModel[]> => {
-            return await ProjectsModel.findAll({
-                where: { userId: user.id },
-            });
-        },
+  },
+
+  Mutation: {
+    createProjects: async (_: any, { data }: { data: Record<string, any> }) => {
+      return await ProjectsModel.create(data);
     },
-    Task: {
-        projects: async (task: { id: number }): Promise<typeof ProjectsModel[]> => {
-            return await ProjectsModel.findAll({
-                where: { taskId: task.id },
-            });
-        },
+
+    updateProjects: async (_: any, { id, data }: { id: number; data: Record<string, any> }) => {
+      const [affectedCount] = await ProjectsModel.update(data, { where: { id } });
+      if (affectedCount > 0) {
+        return await ProjectsModel.findByPk(id);
+      }
+      return null;
     },
-    Project: {
-        user: async (project: { userId: number }): Promise<typeof UserProjectModel | null> => {
-            return await UserProjectModel.findByPk(project.userId);
-        },
-        task: async (project: { taskId: number }): Promise<typeof TaskProjectModel | null> => {
-            return await TaskProjectModel.findByPk(project.taskId);
-        },
+
+    deleteProjects: async (_: any, { id }: { id: number }) => {
+      const deletedCount = await ProjectsModel.destroy({ where: { id } });
+      return deletedCount > 0;
     },
-    TaskList: {
-        projects: async (task: { id: number }): Promise<typeof ProjectsModel[]> => {
-            return await ProjectsModel.findAll({
-                where: { taskId: task.id },
-            });
-        },
+  },
+
+  User: {
+    projects: async (user: { id: number }) => {
+      return await ProjectsModel.findAll({ where: { createdBy: user.id } });
     },
-    UserList: {
-        projects: async (user: { id: number }): Promise<typeof ProjectsModel[]> => {
-            return await ProjectsModel.findAll({
-                where: { userId: user.id },
-            });
-        },
+  },
+
+  Project: {
+    user: async (project: { createdBy: number }) => {
+      return await UserProjectModel.findByPk(project.createdBy);
     },
-    ProjectsList: {
-        projects: async (project: { id: number }): Promise<typeof ProjectsModel[]> => {
-            return await ProjectsModel.findAll({
-                where: { projectId: project.id },
-            });
-        },
+    tasks: async (project: { id: number }) => {
+      return await TaskProjectModel.findAll({ where: { projectId: project.id } });
     },
+  },
 };
+
 module.exports = projectsResolver;

@@ -1,109 +1,128 @@
-const { Tasks : TaskModel, Users: UserTaskMode, Comments: CommentTaskModel, Projects: ProjectsTaskModel, Subtasks: SubtaskTaskModel, StatusTask: StatusTaskModel, Priorities: PrioritiesTaskModel, Tags: TagsTaskModel } = require('../models');
+const {
+  Tasks: TaskModel,
+  Users: UserModelForTask,
+  Comments: CommentModelForTask,
+  Projects: ProjectModelForTask,
+  Subtasks: SubtaskModelForTask,
+  StatusTask: StatusModelForTask,
+  Priorities: PriorityModelForTask,
+  Tags: TagModelForTask,
+} = require("../models");
 
-interface TaskData {
-    [key: string]: any;
-}
+console.log({
+  UserModelForTask,
+  CommentModelForTask,
+  ProjectModelForTask,
+  SubtaskModelForTask,
+  StatusModelForTask,
+  PriorityModelForTask,
+  TagModelForTask,
+});
 
-interface TaskResolver {
-    Query: {
-        allTasks: () => Promise<any>;
-        taskById: (_: any, args: { id: number }) => Promise<any>;
-    };
-    Mutation: {
-        createTask: (_: any, args: { data: TaskData }) => Promise<any>;
-        updateTask: (_: any, args: { id: number, data: TaskData }) => Promise<any>;
-        deleteTask: (_: any, args: { id: number }) => Promise<boolean>;
-    };
-    Task: {
-        user: (task: any) => Promise<any>;
-        comments: (task: any) => Promise<any>;
-        project: (task: any) => Promise<any>;
-        subtasks: (task: any) => Promise<any>;
-        status: (task: any) => Promise<any>;
-        priority: (task: any) => Promise<any>;
-        tags: (task: any) => Promise<any>;
-    };
-}
-
-const taskResolver: TaskResolver = {
-    Query: {
-        allTasks: async (): Promise<any> => {
-            return await Tasks.findAll({
-                include: [
-                    { model: Users, as: 'user' },
-                    { model: Comments, as: 'comments' },
-                    { model: Projects, as: 'project' },
-                    { model: Subtasks, as: 'subtasks' },
-                    { model: StatusTask, as: 'status' },
-                    { model: Priorities, as: 'priority' },
-                    { model: Tags, as: 'tags' }, // many-to-many con tabla intermedia
-                ],
-            });
-        },
-        taskById: async (_: any, { id }: { id: number }): Promise<any> => {
-            return await Tasks.findByPk(id, {
-                include: [
-                    { model: Users, as: 'user' },
-                    { model: Comments, as: 'comments' },
-                    { model: Projects, as: 'project' },
-                    { model: Subtasks, as: 'subtasks' },
-                    { model: StatusTask, as: 'status' },
-                    { model: Priorities, as: 'priority' },
-                    { model: Tags, as: 'tags' },
-                ],
-            });
-        },
+const tasksResolver = {
+  Query: {
+    allTasks: async () => {
+      return await TaskModel.findAll({
+        include: [
+          { model: UserModelForTask, as: "user" },
+          { model: CommentModelForTask, as: "comments" },
+          { model: ProjectModelForTask, as: "project" },
+          { model: SubtaskModelForTask, as: "subtasks" },
+          { model: StatusModelForTask, as: "status" },
+          { model: PriorityModelForTask, as: "priority" },
+          { model: TagModelForTask, as: "tags" },
+        ],
+      });
     },
 
-    Mutation: {
-        createTask: async (_: any, { data }: { data: TaskData }): Promise<any> => {
-            const { tags, ...taskData } = data;
+    taskById: async (_: any, { id }: { id: number }) => {
+      return await TaskModel.findByPk(id, {
+        include: [
+          { model: UserModelForTask, as: "user" },
+          { model: CommentModelForTask, as: "comments" },
+          { model: ProjectModelForTask, as: "project" },
+          { model: SubtaskModelForTask, as: "subtasks" },
+          { model: StatusModelForTask, as: "status" },
+          { model: PriorityModelForTask, as: "priority" },
+          { model: TagModelForTask, as: "tags" },
+        ],
+      });
+    },
+  },
+  
 
-            const newTask = await Tasks.create(taskData);
+  Mutation: {
+    createTask: async (_: any, { data }: { data: Record<string, any> }) => {
+      const { tags, ...taskData } = data;
+      const task = await TaskModel.create(taskData);
 
-            // Asociar tags si vienen
-            if (tags && Array.isArray(tags)) {
-                await newTask.setTags(tags); // espera un array de IDs de tags
-            }
+      if (tags && Array.isArray(tags)) {
+        await task.setTags(tags);
+      }
 
-            return await Tasks.findByPk(newTask.id, {
-                include: [{ model: Tags, as: 'tags' }],
-            });
-        },
-
-        updateTask: async (_: any, { id, data }: { id: number, data: TaskData }): Promise<any> => {
-            const { tags, ...taskData } = data;
-
-            const [affected] = await Tasks.update(taskData, { where: { id } });
-
-            if (affected === 0) return null;
-
-            const updatedTask = await Tasks.findByPk(id);
-
-            if (tags && Array.isArray(tags)) {
-                await updatedTask.setTags(tags);
-            }
-
-            return await Tasks.findByPk(id, {
-                include: [{ model: Tags, as: 'tags' }],
-            });
-        },
-
-        deleteTask: async (_: any, { id }: { id: number }): Promise<boolean> => {
-            const deleted = await Tasks.destroy({ where: { id } });
-            return deleted > 0;
-        },
+      // Retornar con relaciones cargadas
+      return await TaskModel.findByPk(task.id, {
+        include: [{ model: TagModelForTask, as: "tags" }],
+      });
     },
 
-    Task: {
-        user: async (task: any): Promise<any> => await task.getUser(),
-        comments: async (task: any): Promise<any> => await task.getComments(),
-        project: async (task: any): Promise<any> => await task.getProject(),
-        subtasks: async (task: any): Promise<any> => await task.getSubtasks(),
-        status: async (task: any): Promise<any> => await task.getStatus(),
-        priority: async (task: any): Promise<any> => await task.getPriority(),
-        tags: async (task: any): Promise<any> => await task.getTags(),
+    updateTask: async (_: any, { id, data }: { id: number; data: Record<string, any> }) => {
+      const { tags, ...taskData } = data;
+
+      const [affectedCount] = await TaskModel.update(taskData, {
+        where: { id },
+      });
+
+      if (affectedCount > 0) {
+        const updatedTask = await TaskModel.findByPk(id);
+
+        if (tags && Array.isArray(tags)) {
+          await updatedTask.setTags(tags);
+        }
+
+        return await TaskModel.findByPk(id, {
+          include: [{ model: TagModelForTask, as: "tags" }],
+        });
+      }
+
+      return null;
     },
+
+    deleteTask: async (_: any, { id }: { id: number }) => {
+      const deletedCount = await TaskModel.destroy({
+        where: { id },
+      });
+      return deletedCount > 0;
+    },
+  },
+
+  Task: {
+    user: async (task: { userId: number }) => {
+      return await UserModelForTask.findByPk(task.userId);
+    },
+    comments: async (task: { id: number }) => {
+      return await CommentModelForTask.findAll({ where: { taskId: task.id } });
+    },
+    project: async (task: { projectId: number }) => {
+      return await ProjectModelForTask.findByPk(task.projectId);
+    },
+    subtasks: async (task: { id: number }) => {
+      return await SubtaskModelForTask.findAll({ where: { taskId: task.id } });
+    },
+    status: async (task: { statusId: number }) => {
+      return await StatusModelForTask.findByPk(task.statusId);
+    },
+    priority: async (task: { priorityId: number }) => {
+      return await PriorityModelForTask.findByPk(task.priorityId);
+    },
+    tags: async (task: { id: number }) => {
+      const taskInstance = await TaskModel.findByPk(task.id);
+      return await taskInstance.getTags();
+    },
+     dueDate: (task: { dueDate: string }) => {
+    return new Date(task.dueDate).toISOString().split('T')[0];
+  },
+  },
 };
 
-module.exports = taskResolver;
+module.exports = tasksResolver;

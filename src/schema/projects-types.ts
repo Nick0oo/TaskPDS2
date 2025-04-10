@@ -3,10 +3,12 @@ const gqlProjectsTypes = require('graphql-tag');
 const ProjectsTypes = gqlProjectsTypes`
   type Project {
     id: ID!
-    name: String!
+    title: String!
     description: String
     createdAt: String
     updatedAt: String
+    user: User
+    Tasks: [Task]
   }
 
   type Projects {
@@ -14,24 +16,32 @@ const ProjectsTypes = gqlProjectsTypes`
   }
 
   input CreateProjectInput {
-    name: String!
+    title: String!
     description: String
+    createdBy: ID!
   }
 
   input UpdateProjectInput {
-    name: String
+    title: String
     description: String
   }
 
   extend type Query {
     allProjects: [Project!]
-    projectById(id: ID!): Project
+    projectsById(id: ID!): Project
   }
 
   extend type Mutation {
-    createProject(data: CreateProjectInput!): Project!
-    updateProject(id: ID!, data: UpdateProjectInput!): Project
-    deleteProject(id: ID!): Boolean!
+    createProjects(data: CreateProjectInput!): Project!
+    updateProjects(id: ID!, data: UpdateProjectInput!): Project
+    deleteProjects(id: ID!): Boolean!
+  }
+    extend type User {
+    projects: [Project!]  
+  }
+
+  extend type Task {
+    project: Project
   }
 `;
 
