@@ -1,4 +1,4 @@
-# 🚀 Backend API - Spring Boot + Docker + Mongo Express
+# 🚀 Backend API - GraphQl + Docker + PostgreSQL
 
 Bienvenido a este proyecto de backend desarrollado con **GraphQl**, **Docker** y **PostgreSQL**.  
 Esta API permite gestionar datos de forma eficiente y está preparada para producción.
